@@ -8,12 +8,16 @@ public class Game {
 
     private Player p1;
     private Player p2;
+    private Player curPlayer;
     private Board board;
     private Dice dice;
+
     private boolean versusComputer;
     private boolean gameOver;
     private int lastRoll;
-    private Player curPlayer;
+    private int firstPosition;
+    private int afterRollPosition;
+    private int finalPosition;
 
     public Game(String p1, String p2) {
         this.p1 = new Player(p1);
@@ -22,10 +26,6 @@ public class Game {
         this.dice = new Dice();
         this.versusComputer = false;
         this.gameOver = false;
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
     }
 
     public Game(String p1) {
@@ -38,19 +38,49 @@ public class Game {
     }
 
     public void start() {
-        this.p1.setPosition(board.getTile(1));
-        this.p2.setPosition(board.getTile(1));
+        Tile zero = new Tile(0) {
+            @Override
+            public String toString() {
+                return "";
+            }
+        };
+        this.p1.setPosition(zero);
+        this.p2.setPosition(zero);
         this.curPlayer = this.p1;
         printBoardString();
+        printStatus();
     }
 
     public void play() {
-        this.lastRoll = this.dice.roll();
-        int position = curPlayer.getPosition() + this.lastRoll;
-        this.curPlayer.setPosition(board.getTile(nextPosition(position)));
+        if (versusComputer) {
+            playPVBot();
+        } else {
+            playPVP();
+        }
+    }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public Player getCurPlayer() {
+        return curPlayer;
+    }
+
+    private void playPVP() {
+        updatePosition();
         printBoardString();
+        printStatus();
         end();
+    }
+
+    private void playPVBot() {
+        printBoardString();
+        do {
+            updatePosition();
+            printStatus();
+            end();
+        } while (this.curPlayer == this.p2);
     }
 
     private void end() {
@@ -66,42 +96,45 @@ public class Game {
         }
     }
 
-    private void printWinner() {
-        System.out.println("CONGRATULATION!!!");
-        System.out.println(this.curPlayer + " is the winner!");
+    private void printBoardString() {
+        System.out.println(this.board);
     }
 
-    public void printBoardString() {
-        Tile[] tiles = this.board.getBoard();
+    private void printStatus() {
         String r = new String();
-        for (int i = 0; i < 10; i++) {
-            int puluhan = i * 10;
-            if (i % 2 == 0) {//genap
-                for (int j = 9; j >= 0; j--) {
-                    r = " " + tiles[puluhan + j] + " |" + r;
-                }
-            } else {//ganjil
-                for (int j = 0; j < 10; j++) {
-                    r = " " + tiles[puluhan + j] + " |" + r;
-                }
-            }
-            r = "\n|" + r;
-        }
         if (this.lastRoll != 0) {
-            r += "\nNow is " + this.curPlayer + "'s turn!";
-            r += "\nDice Roll " + this.lastRoll;
+            r += "\nDice roll " + this.lastRoll;
+            r += "\n" + this.curPlayer + " move from " + this.firstPosition + " to " + this.afterRollPosition;
+            if (this.board.getTile(this.afterRollPosition) instanceof TileLadder) {
+                r += "\nYaay, " + this.curPlayer + " found a ladder to " + this.finalPosition;
+            } else if (this.board.getTile(this.afterRollPosition) instanceof TileSnake) {
+                r += "\nAwww, " + this.curPlayer + " found a snake to " + this.finalPosition;
+            }
         }
         r += "\n" + p1 + "'s position : " + p1.getPosition() + "\n";
         r += p2 + "'s position : " + p2.getPosition();
         System.out.println(r);
     }
 
-    private int nextPosition(int value) {
+    private void printWinner() {
+        System.out.println("\nCONGRATULATION!!!");
+        System.out.println(this.curPlayer + " is the winner!");
+    }
+
+    private void updatePosition() {
+        this.lastRoll = this.dice.roll();
+        this.firstPosition = this.curPlayer.getPosition();
+        int position = this.firstPosition + this.lastRoll;
+        nextPosition(position);
+        this.curPlayer.setPosition(this.board.getTile(this.finalPosition));
+    }
+
+    private void nextPosition(int value) {
         if (isOverlap(value)) {
             value = 200 - value;
         }
-        value = this.board.getTile(value).getTarget();
-        return value;
+        afterRollPosition = value;
+        finalPosition = this.board.getTile(value).getTarget();
     }
 
     private boolean isOverlap(int value) {
