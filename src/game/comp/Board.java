@@ -18,9 +18,28 @@ public class Board {
     public Tile getTile(int value) {
         return this.tiles[value - 1];
     }
-    
-    public Tile[] getBoard(){
+
+    public Tile[] getBoard() {
         return this.tiles;
+    }
+
+    @Override
+    public String toString() {
+        String r = new String();
+        for (int i = 0; i < 10; i++) {
+            int puluhan = i * 10;
+            if (i % 2 == 0) {//genap
+                for (int j = 9; j >= 0; j--) {
+                    r = tiles[puluhan + j] + "|" + r;
+                }
+            } else {//ganjil
+                for (int j = 0; j < 10; j++) {
+                    r = tiles[puluhan + j] + "|" + r;
+                }
+            }
+            r = "\n|" + r;
+        }
+        return r;
     }
 
     private void generateTiles(int snake, int ladder) {
