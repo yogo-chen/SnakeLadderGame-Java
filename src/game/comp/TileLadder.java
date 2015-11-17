@@ -10,10 +10,4 @@ public class TileLadder extends Tile {
         super(value);
         this.target = target;
     }
-
-    @Override
-    public String toString() {
-        return (String.format("%3d - %-3d", this.value, this.target.getValue()));
-    }
-
 }
