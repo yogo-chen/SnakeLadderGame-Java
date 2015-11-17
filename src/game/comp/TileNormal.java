@@ -10,10 +10,4 @@ public class TileNormal extends Tile {
         super(value);
         this.target = this;
     }
-
-    @Override
-    public String toString() {
-        return (String.format("%3d -    ", this.value));
-    }
-
 }
