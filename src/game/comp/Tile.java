@@ -22,5 +22,7 @@ public abstract class Tile {
     }
 
     @Override
-    public abstract String toString();
+    public String toString() {
+        return (String.format("%3d-%-3s", this.value, this.target == this ? "" : this.target.getValue()));
+    }
 }
