@@ -19,10 +19,6 @@ public class Board {
         return this.tiles[value - 1];
     }
 
-    public Tile[] getBoard() {
-        return this.tiles;
-    }
-
     @Override
     public String toString() {
         String r = new String();
@@ -30,11 +26,11 @@ public class Board {
             int puluhan = i * 10;
             if (i % 2 == 0) {//genap
                 for (int j = 9; j >= 0; j--) {
-                    r = tiles[puluhan + j] + "|" + r;
+                    r = this.tiles[puluhan + j] + "|" + r;
                 }
             } else {//ganjil
                 for (int j = 0; j < 10; j++) {
-                    r = tiles[puluhan + j] + "|" + r;
+                    r = this.tiles[puluhan + j] + "|" + r;
                 }
             }
             r = "\n|" + r;
