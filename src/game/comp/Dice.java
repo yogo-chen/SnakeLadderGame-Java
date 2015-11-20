@@ -8,10 +8,13 @@ import java.util.Random;
  */
 public class Dice {
 
-    private Random r = new Random();
+    private Random r;
 
-    public int roll() {
-        return r.nextInt(6) + 1;
+    public Dice() {
+        this.r = new Random();
     }
 
+    public int roll() {
+        return this.r.nextInt(6) + 1;
+    }
 }
