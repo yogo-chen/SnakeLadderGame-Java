@@ -37,6 +37,42 @@ public class Game {
         this.gameOver = false;
     }
 
+    public Player getP1() {
+        return this.p1;
+    }
+
+    public Player getP2() {
+        return this.p2;
+    }
+
+    public Player getCurPlayer() {
+        return this.curPlayer;
+    }
+
+    public boolean isVersusComputer() {
+        return this.versusComputer;
+    }
+
+    public int getLastRoll() {
+        return this.lastRoll;
+    }
+
+    public int getFirstPosition() {
+        return this.firstPosition;
+    }
+
+    public int getAfterRollPosition() {
+        return this.afterRollPosition;
+    }
+
+    public int getFinalPosition() {
+        return this.finalPosition;
+    }
+
+    public boolean isGameOver() {
+        return this.gameOver;
+    }
+
     public void start() {
         Tile zero = new Tile(0) {
             @Override
@@ -52,26 +88,18 @@ public class Game {
     }
 
     public void play() {
-        if (versusComputer) {
+        if (this.versusComputer) {
             playPVBot();
         } else {
             playPVP();
         }
     }
 
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
-    public Player getCurPlayer() {
-        return curPlayer;
-    }
-
     private void playPVP() {
         updatePosition();
         printBoardString();
         printStatus();
-        end();
+        endPlay();
     }
 
     private void playPVBot() {
@@ -79,11 +107,11 @@ public class Game {
         do {
             updatePosition();
             printStatus();
-            end();
-        } while (this.curPlayer == this.p2);
+            endPlay();
+        } while (this.curPlayer == this.p2 && !this.gameOver);
     }
 
-    private void end() {
+    private void endPlay() {
         if (this.curPlayer.getPosition() == 100) {
             this.gameOver = true;
             printWinner();
@@ -111,8 +139,8 @@ public class Game {
                 r += "\nAwww, " + this.curPlayer + " found a snake to " + this.finalPosition;
             }
         }
-        r += "\n" + p1 + "'s position : " + p1.getPosition() + "\n";
-        r += p2 + "'s position : " + p2.getPosition();
+        r += "\n" + this.p1 + "'s position : " + this.p1.getPosition() + "\n";
+        r += this.p2 + "'s position : " + this.p2.getPosition();
         System.out.println(r);
     }
 
@@ -122,22 +150,34 @@ public class Game {
     }
 
     private void updatePosition() {
+        roll();
+        setFirstPosition();
+        setAfterRollPosition();
+        setFinalPosition();
+        setCurPlayerPosition();
+    }
+
+    private void roll() {
         this.lastRoll = this.dice.roll();
+    }
+
+    private void setFirstPosition() {
         this.firstPosition = this.curPlayer.getPosition();
+    }
+
+    private void setAfterRollPosition() {
         int position = this.firstPosition + this.lastRoll;
-        nextPosition(position);
-        this.curPlayer.setPosition(this.board.getTile(this.finalPosition));
-    }
-
-    private void nextPosition(int value) {
-        if (isOverlap(value)) {
-            value = 200 - value;
+        if (position > 100) {
+            position = 200 - position;
         }
-        afterRollPosition = value;
-        finalPosition = this.board.getTile(value).getTarget();
+        this.afterRollPosition = position;
     }
 
-    private boolean isOverlap(int value) {
-        return value > 100;
+    private void setFinalPosition() {
+        this.finalPosition = this.board.getTile(this.afterRollPosition).getTarget();
+    }
+
+    private void setCurPlayerPosition() {
+        this.curPlayer.setPosition(this.board.getTile(this.finalPosition));
     }
 }
